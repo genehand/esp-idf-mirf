@@ -8,6 +8,7 @@ menu "nRF24L01 Configuration"
 		default 18 if IDF_TARGET_ESP32C2
 		default 19 if IDF_TARGET_ESP32C3
 		default 30 if IDF_TARGET_ESP32C6
+		default 27 if IDF_TARGET_ESP32H2
 
 	config RADIO_CHANNEL
 		int "Channel number"
