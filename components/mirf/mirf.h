@@ -202,6 +202,7 @@ void      Nrf24_setRetransmitCount(NRF24_t * dev, uint8_t val);
 void      Nrf24_ceHi(NRF24_t * dev);
 void      Nrf24_ceLow(NRF24_t * dev);
 void      Nrf24_flushRx(NRF24_t * dev);
+void      Nrf24_flushTx(NRF24_t *dev);
 void      Nrf24_printDetails(NRF24_t * dev);
 void      Nrf24_print_status(uint8_t status);
 void      Nrf24_print_address_register(NRF24_t * dev, const char* name, uint8_t reg, uint8_t qty);

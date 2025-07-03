@@ -432,6 +432,13 @@ void Nrf24_flushRx(NRF24_t * dev)
 	spi_csnHi(dev);
 }
 
+void Nrf24_flushTx(NRF24_t *dev)
+{
+	spi_csnLow(dev);
+	spi_transfer(dev, FLUSH_TX);
+	spi_csnHi(dev);
+}
+
 void Nrf24_powerUpTx(NRF24_t * dev) {
 	dev->PTX = 1;
 	Nrf24_configRegister(dev, CONFIG, mirf_CONFIG | ( (1 << PWR_UP) | (0 << PRIM_RX) ) ); //set device as TX mode
