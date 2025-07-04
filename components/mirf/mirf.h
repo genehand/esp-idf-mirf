@@ -111,7 +111,8 @@ typedef struct {
 #define RF_PWR_HIGH 2
 
 /* Device addrees length:3~5 bytes */
-#define mirf_ADDR_LEN    5
+// #define mirf_ADDR_LEN    5
+#define mirf_ADDR_LEN    3
 
 /* 
  enable interrupt caused by RX_DR.
@@ -129,7 +130,8 @@ typedef struct {
  enable CRC and CRC data len=1
  mirf_CONFIG == 00101000B
 */
-#define mirf_CONFIG ((1<<MASK_TX_DS) | (1<<EN_CRC) | (0<<CRCO) )
+// #define mirf_CONFIG ((1<<MASK_TX_DS) | (1<<EN_CRC) | (0<<CRCO) )
+#define mirf_CONFIG (1<<MASK_TX_DS)
 
 /**
  * Power Amplifier level.
@@ -214,7 +216,7 @@ uint8_t   Nrf24_getPALevel(NRF24_t * dev);
 char *    Nrf24_getPALevelString(NRF24_t * dev);
 uint8_t   Nrf24_getRetransmitDelay(NRF24_t * dev);
 uint8_t   Nrf24_getRetransmitCount(NRF24_t * dev);
-uint8_t   Nrf24_getChannle(NRF24_t * dev);
+uint8_t   Nrf24_getChannel(NRF24_t * dev);
 uint8_t   Nrf24_getPayload(NRF24_t * dev);
 
 #ifdef __cplusplus

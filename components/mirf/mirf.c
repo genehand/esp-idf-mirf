@@ -18,8 +18,8 @@
 #define HOST_ID SPI3_HOST
 #endif
 
-static const int SPI_Frequency = 4000000; // Stable even with a long jumper cable
-//static const int SPI_Frequency = 6000000;
+// static const int SPI_Frequency = 4000000; // Stable even with a long jumper cable
+static const int SPI_Frequency = 6000000;
 //static const int SPI_Frequency = 8000000; // Requires a short jumper cable
 //static const int SPI_Frequency = 10000000; // Unstable even with a short jumper cable
 
@@ -156,10 +156,10 @@ esp_err_t Nrf24_setRADDR(NRF24_t * dev, uint8_t * adr)
 {
 	esp_err_t ret = ESP_OK;
 	Nrf24_writeRegister(dev, RX_ADDR_P1, adr, mirf_ADDR_LEN);
-	uint8_t buffer[5];
+	uint8_t buffer[mirf_ADDR_LEN];
 	Nrf24_readRegister(dev, RX_ADDR_P1, buffer, sizeof(buffer));
-	for (int i=0;i<5;i++) {
-		ESP_LOGD(TAG, "adr[%d]=0x%x buffer[%d]=0x%x", i, adr[i], i, buffer[i]);
+	for (int i=0;i<mirf_ADDR_LEN;i++) {
+		ESP_LOGI(TAG, "adr[%d]=0x%x buffer[%d]=0x%x", i, adr[i], i, buffer[i]);
 		if (adr[i] != buffer[i]) ret = ESP_FAIL;
 	}
 	return ret;
@@ -172,10 +172,10 @@ esp_err_t Nrf24_setTADDR(NRF24_t * dev, uint8_t * adr)
 	esp_err_t ret = ESP_OK;
 	Nrf24_writeRegister(dev, RX_ADDR_P0, adr, mirf_ADDR_LEN); //RX_ADDR_P0 must be set to the sending addr for auto ack to work.
 	Nrf24_writeRegister(dev, TX_ADDR, adr, mirf_ADDR_LEN);
-	uint8_t buffer[5];
+	uint8_t buffer[mirf_ADDR_LEN];
 	Nrf24_readRegister(dev, RX_ADDR_P0, buffer, sizeof(buffer));
-	for (int i=0;i<5;i++) {
-		ESP_LOGD(TAG, "adr[%d]=0x%x buffer[%d]=0x%x", i, adr[i], i, buffer[i]);
+	for (int i=0;i<mirf_ADDR_LEN;i++) {
+		ESP_LOGI(TAG, "adr[%d]=0x%x buffer[%d]=0x%x", i, adr[i], i, buffer[i]);
 		if (adr[i] != buffer[i]) ret = ESP_FAIL;
 	}
 	return ret;
@@ -519,11 +519,11 @@ void Nrf24_setRetransmitCount(NRF24_t * dev, uint8_t val)
 void Nrf24_printDetails(NRF24_t * dev)
 {
 
-	printf("================ SPI Configuration ================\n" );
-	printf("CSN Pin  \t = GPIO%d\n",dev->csnPin);
-	printf("CE Pin	\t = GPIO%d\n", dev->cePin);
-	printf("Clock Speed\t = %d\n", SPI_Frequency);
-	printf("================ NRF Configuration ================\n");
+	ESP_LOGI(TAG, "================ SPI Configuration ================\n" );
+	ESP_LOGI(TAG, "CSN Pin  \t = GPIO%d\n",dev->csnPin);
+	ESP_LOGI(TAG, "CE Pin	\t = GPIO%d\n", dev->cePin);
+	ESP_LOGI(TAG, "Clock Speed\t = %d\n", SPI_Frequency);
+	ESP_LOGI(TAG, "================ NRF Configuration ================\n");
 
 	Nrf24_print_status(Nrf24_getStatus(dev));
 
@@ -539,60 +539,60 @@ void Nrf24_printDetails(NRF24_t * dev)
 	Nrf24_print_byte_register(dev, "CONFIG\t", CONFIG, 1);
 	Nrf24_print_byte_register(dev, "DYNPD/FEATURE", DYNPD, 2);
 	//printf("getDataRate()=%d\n",Nrf24_getDataRate(dev));
-	printf("Data Rate\t = %s\n",rf24_datarates[Nrf24_getDataRate(dev)]);
+	ESP_LOGI(TAG, "Data Rate\t = %s\n",rf24_datarates[Nrf24_getDataRate(dev)]);
 #if 0
 	printf_P(PSTR("Model\t\t = "
 	PRIPSTR
 	"\r\n"),pgm_read_ptr(&rf24_model_e_str_P[isPVariant()]));
 #endif
 	//printf("getCRCLength()=%d\n",Nrf24_getCRCLength(dev));
-	printf("CRC Length\t = %s\n", rf24_crclength[Nrf24_getCRCLength(dev)]);
+	ESP_LOGI(TAG, "CRC Length\t = %s\n", rf24_crclength[Nrf24_getCRCLength(dev)]);
 	//printf("getPALevel()=%d\n",Nrf24_getPALevel(dev));
-	printf("PA Power\t = %s\n", rf24_pa_dbm[Nrf24_getPALevel(dev)]);
+	ESP_LOGI(TAG, "PA Power\t = %s\n", rf24_pa_dbm[Nrf24_getPALevel(dev)]);
 	uint8_t retransmit = Nrf24_getRetransmitDelay(dev);
 	int16_t delay = (retransmit+1)*250;
-	printf("Retransmit\t = %d us\n", delay);
+	ESP_LOGI(TAG, "Retransmit\t = %d us\n", delay);
 }
 
 #define _BV(x) (1<<(x))
 
 void Nrf24_print_status(uint8_t status)
 {
-	printf("STATUS\t\t = 0x%02x RX_DR=%x TX_DS=%x MAX_RT=%x RX_P_NO=%x TX_FULL=%x\r\n", status, (status & _BV(RX_DR)) ? 1 : 0,
+	ESP_LOGI(TAG, "STATUS\t\t = 0x%02x RX_DR=%x TX_DS=%x MAX_RT=%x RX_P_NO=%x TX_FULL=%x", status, (status & _BV(RX_DR)) ? 1 : 0,
 			(status & _BV(TX_DS)) ? 1 : 0, (status & _BV(MAX_RT)) ? 1 : 0, ((status >> RX_P_NO) & 0x07), (status & _BV(TX_FULL)) ? 1 : 0);
 }
 
 void Nrf24_print_address_register(NRF24_t * dev, const char* name, uint8_t reg, uint8_t qty)
 {
-	printf("%s\t =",name);
+	ESP_LOGI(TAG, "%s\t =",name);
 	while (qty--) {
-		//uint8_t buffer[addr_width];
-		uint8_t buffer[5];
+		uint8_t buffer[mirf_ADDR_LEN];
+		// uint8_t buffer[5];
 		Nrf24_readRegister(dev, reg++, buffer, sizeof(buffer));
 
-		printf(" 0x");
+		ESP_LOGI(TAG, " 0x");
 #if 0
 		uint8_t* bufptr = buffer + sizeof buffer;
 		while (--bufptr >= buffer) {
 			printf("%02x", *bufptr);
 		}
 #endif
-		for(int i=0;i<5;i++) {
-			printf("%02x", buffer[i]);
+		for(int i=0;i<mirf_ADDR_LEN;i++) {
+			ESP_LOGI(TAG, "%02x", buffer[i]);
 		}
 	}
-	printf("\r\n");
+	// ESP_LOGI(TAG, "");
 }
 
 void Nrf24_print_byte_register(NRF24_t * dev, const char* name, uint8_t reg, uint8_t qty)
 {
-	printf("%s\t =", name);
+	ESP_LOGI(TAG, "%s\t =", name);
 	while (qty--) {
 		uint8_t buffer[1];
 		Nrf24_readRegister(dev, reg++, buffer, 1);
-		printf(" 0x%02x", buffer[0]);
+		ESP_LOGI(TAG, " 0x%02x", buffer[0]);
 	}
-	printf("\r\n");
+	// ESP_LOGI(TAG, "");
 }
 
 uint8_t Nrf24_getDataRate(NRF24_t * dev)
@@ -674,7 +674,7 @@ uint8_t Nrf24_getRetransmitCount(NRF24_t * dev)
 }
 
 
-uint8_t Nrf24_getChannle(NRF24_t * dev)
+uint8_t Nrf24_getChannel(NRF24_t * dev)
 {
 	return dev->channel;
 }
